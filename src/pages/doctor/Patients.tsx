@@ -4,7 +4,7 @@ import { Search, Plus, MoreVertical } from 'lucide-react';
 import { cn } from '../../utils';
 
 interface Patient {
-  id: number;
+  id: string;
   name: string;
   cpf: string;
   email: string;
@@ -32,13 +32,12 @@ export default function Patients() {
     fetchPatients();
   }, []);
 
-  const fetchPatients = async () => {
+  const fetchPatients = () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/patients');
-      if (response.ok) {
-        const data = await response.json();
-        setPatients(data);
-      }
+      const allUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+      const patientList = allUsers.filter((u: any) => u.role === 'patient');
+      setPatients(patientList);
     } catch (error) {
       console.error('Error fetching patients:', error);
     } finally {
@@ -50,23 +49,32 @@ export default function Patients() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleCreatePatient = async () => {
+  const handleCreatePatient = () => {
     try {
-      const response = await fetch('/api/patients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setShowNewPatient(false);
-        setFormData({ name: '', cpf: '', email: '', phone: '', dob: '' });
-        fetchPatients(); // Refresh list
-      } else {
-        alert('Erro ao criar paciente');
+      const allUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+      
+      // Check if email already exists
+      if (allUsers.find((u: any) => u.email === formData.email)) {
+        alert('Este e-mail já está cadastrado.');
+        return;
       }
+
+      const newPatient = {
+        id: Date.now().toString(),
+        role: 'patient',
+        ...formData,
+        password: '123' // Default password for testing
+      };
+
+      allUsers.push(newPatient);
+      localStorage.setItem('telemed_users', JSON.stringify(allUsers));
+
+      setShowNewPatient(false);
+      setFormData({ name: '', cpf: '', email: '', phone: '', dob: '' });
+      fetchPatients(); // Refresh list
     } catch (error) {
       console.error('Error creating patient:', error);
+      alert('Erro ao criar paciente');
     }
   };
 

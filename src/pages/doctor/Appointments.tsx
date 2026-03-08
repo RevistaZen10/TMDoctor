@@ -3,16 +3,17 @@ import { Calendar, Clock, MoreVertical, CheckCircle2, XCircle, RefreshCw, Video 
 import { cn } from '../../utils';
 
 interface Appointment {
-  id: number;
+  id: string;
   date: string;
   time: string;
+  patient_id: string;
   patient_name: string;
   patient_peer_id?: string;
   status: 'scheduled' | 'completed' | 'canceled';
 }
 
 interface Patient {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -28,18 +29,51 @@ export default function Appointments() {
     fetchAppointments();
   }, []);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/appointments?doctor_id=${doctorId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setAppointments(data);
-      }
+      const allAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+      const allUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+      
+      const doctorAppointments = allAppointments
+        .filter((apt: any) => apt.doctor_id === doctorId)
+        .map((apt: any) => {
+          const patient = allUsers.find((u: any) => u.id === apt.patient_id);
+          return {
+            ...apt,
+            patient_name: patient ? patient.name : 'Paciente Desconhecido',
+            patient_peer_id: patient ? patient.peer_id : undefined
+          };
+        });
+
+      // Sort by date and time
+      doctorAppointments.sort((a: any, b: any) => {
+        const dateA = new Date(`${a.date}T${a.time}`);
+        const dateB = new Date(`${b.date}T${b.time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
+
+      setAppointments(doctorAppointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateAppointmentStatus = (id: string, newStatus: 'completed' | 'canceled') => {
+    try {
+      const allAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+      const updated = allAppointments.map((apt: any) => {
+        if (apt.id === id) {
+          return { ...apt, status: newStatus };
+        }
+        return apt;
+      });
+      localStorage.setItem('telemed_appointments', JSON.stringify(updated));
+      fetchAppointments();
+    } catch (error) {
+      console.error('Error updating status:', error);
     }
   };
 
@@ -105,7 +139,7 @@ export default function Appointments() {
                   <tr key={apt.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="p-4 font-medium text-slate-900 flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-slate-400" />
-                      {new Date(apt.date).toLocaleDateString('pt-BR')}
+                      {new Date(apt.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
                     </td>
                     <td className="p-4 text-slate-600">
                       <div className="flex items-center gap-2">
@@ -137,10 +171,18 @@ export default function Appointments() {
                             >
                               <Video className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors" title="Marcar como concluída">
+                            <button 
+                              onClick={() => updateAppointmentStatus(apt.id, 'completed')}
+                              className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors" 
+                              title="Marcar como concluída"
+                            >
                               <CheckCircle2 className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Cancelar consulta">
+                            <button 
+                              onClick={() => updateAppointmentStatus(apt.id, 'canceled')}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors" 
+                              title="Cancelar consulta"
+                            >
                               <XCircle className="w-4 h-4" />
                             </button>
                           </>

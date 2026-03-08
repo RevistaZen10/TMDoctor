@@ -3,15 +3,17 @@ import { Calendar, Clock, Plus, CheckCircle2, XCircle, AlertCircle } from 'lucid
 import { cn } from '../../utils';
 
 interface Appointment {
-  id: number;
+  id: string;
   date: string;
   time: string;
+  doctor_id: string;
   doctor_name: string;
+  patient_id: string;
   status: 'scheduled' | 'completed' | 'canceled';
 }
 
 interface Doctor {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -20,7 +22,6 @@ export default function PatientAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
-  const [patientId, setPatientId] = useState<number | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -33,42 +34,27 @@ export default function PatientAppointments() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
-    const fetchPatientAndData = async () => {
-      if (!user.email) {
-        console.error('User email not found in local storage');
-        setLoading(false);
-        return;
-      }
+    if (!user.id) {
+      setLoading(false);
+      return;
+    }
+    fetchAppointments();
+    fetchDoctors();
+  }, [user.id]);
 
-      try {
-        // 1. Get Patient ID
-        const patientRes = await fetch(`/api/patients/by-email/${user.email}`);
-        if (!patientRes.ok) throw new Error('Patient not found');
-        const patient = await patientRes.json();
-        setPatientId(patient.id);
-
-        // 2. Get Appointments
-        fetchAppointments(patient.id);
-        
-        // 3. Get Doctors
-        fetchDoctors();
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchPatientAndData();
-  }, [user.email]);
-
-  const fetchAppointments = async (id: number) => {
+  const fetchAppointments = () => {
     try {
-      const response = await fetch(`/api/patients/${id}/appointments`);
-      if (response.ok) {
-        const data = await response.json();
-        setAppointments(data);
-      }
+      const allAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+      const patientAppointments = allAppointments.filter((apt: any) => apt.patient_id === user.id);
+      
+      // Sort by date and time
+      patientAppointments.sort((a: any, b: any) => {
+        const dateA = new Date(`${a.date}T${a.time}`);
+        const dateB = new Date(`${b.date}T${b.time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
+
+      setAppointments(patientAppointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     } finally {
@@ -76,13 +62,11 @@ export default function PatientAppointments() {
     }
   };
 
-  const fetchDoctors = async () => {
+  const fetchDoctors = () => {
     try {
-      const response = await fetch('/api/doctors');
-      if (response.ok) {
-        const data = await response.json();
-        setDoctors(data);
-      }
+      const allUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+      const doctorList = allUsers.filter((u: any) => u.role === 'doctor');
+      setDoctors(doctorList);
     } catch (error) {
       console.error('Error fetching doctors:', error);
     }
@@ -92,28 +76,35 @@ export default function PatientAppointments() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleCreateAppointment = async () => {
-    if (!patientId) return;
+  const handleCreateAppointment = () => {
+    if (!user.id || !formData.doctor_id || !formData.date || !formData.time) {
+      alert('Preencha todos os campos.');
+      return;
+    }
 
     try {
-      const response = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          patient_id: patientId
-        }),
-      });
+      const doctor = doctors.find(d => d.id === formData.doctor_id);
+      
+      const newAppointment: Appointment = {
+        id: Date.now().toString(),
+        patient_id: user.id,
+        doctor_id: formData.doctor_id,
+        doctor_name: doctor?.name || 'Médico',
+        date: formData.date,
+        time: formData.time,
+        status: 'scheduled'
+      };
 
-      if (response.ok) {
-        setShowNewAppointment(false);
-        setFormData({ doctor_id: '', date: '', time: '' });
-        fetchAppointments(patientId); // Refresh list
-      } else {
-        alert('Erro ao criar agendamento');
-      }
+      const allAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+      allAppointments.push(newAppointment);
+      localStorage.setItem('telemed_appointments', JSON.stringify(allAppointments));
+
+      setShowNewAppointment(false);
+      setFormData({ doctor_id: '', date: '', time: '' });
+      fetchAppointments(); // Refresh list
     } catch (error) {
       console.error('Error creating appointment:', error);
+      alert('Erro ao criar agendamento');
     }
   };
 
@@ -154,7 +145,7 @@ export default function PatientAppointments() {
                   <tr key={apt.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-4 font-medium text-slate-900 flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-slate-400" />
-                      {new Date(apt.date).toLocaleDateString('pt-BR')}
+                      {new Date(apt.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
                     </td>
                     <td className="p-4 text-slate-600">
                       <div className="flex items-center gap-2">

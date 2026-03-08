@@ -4,7 +4,7 @@ import { Users, FileText, Calendar, Plus, Search, MoreVertical } from 'lucide-re
 import { cn } from '../../utils';
 
 interface Patient {
-  id: number;
+  id: string;
   name: string;
   cpf: string;
   email: string;
@@ -12,8 +12,9 @@ interface Patient {
 }
 
 interface Appointment {
-  id: number;
+  id: string;
   date: string;
+  doctor_id: string;
 }
 
 export default function Dashboard() {
@@ -22,16 +23,21 @@ export default function Dashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [patientsRes, appointmentsRes] = await Promise.all([
-          fetch('/api/patients'),
-          fetch('/api/appointments')
-        ]);
+  // Get doctor ID from local storage
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const doctorId = user.id;
 
-        if (patientsRes.ok) setPatients(await patientsRes.json());
-        if (appointmentsRes.ok) setAppointments(await appointmentsRes.json());
+  useEffect(() => {
+    const fetchData = () => {
+      try {
+        const allUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+        const allAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+
+        const patientList = allUsers.filter((u: any) => u.role === 'patient');
+        const doctorAppointments = allAppointments.filter((apt: any) => apt.doctor_id === doctorId);
+
+        setPatients(patientList);
+        setAppointments(doctorAppointments);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -40,7 +46,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [doctorId]);
 
   const stats = [
     { name: 'Total de Pacientes', value: patients.length.toString(), icon: Users, color: 'bg-blue-500' },

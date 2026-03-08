@@ -4,16 +4,18 @@ import { FileText, Download, Clock, CheckCircle2, Video } from 'lucide-react';
 import { cn } from '../../utils';
 
 interface Appointment {
-  id: number;
+  id: string;
   date: string;
   time: string;
+  doctor_id: string;
   doctor_name: string;
+  patient_id: string;
   doctor_peer_id?: string;
   status: string;
 }
 
 interface Record {
-  id: number;
+  id: string;
   date: string;
   content: string;
   doctor_name: string;
@@ -27,45 +29,36 @@ export default function PatientDashboard() {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextAppointment, setNextAppointment] = useState<Appointment | null>(null);
-  const [patientId, setPatientId] = useState<number | null>(null);
   const [canEnterRoom, setCanEnterRoom] = useState(false);
 
   // Get user info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user.email) return;
+    const fetchData = () => {
+      if (!user.id) return;
 
       try {
-        // 1. Get Patient ID by Email
-        const patientRes = await fetch(`/api/patients/by-email/${user.email}`);
-        if (!patientRes.ok) throw new Error('Patient not found');
-        const patient = await patientRes.json();
-        setPatientId(patient.id);
+        // 1. Get Appointments from localStorage
+        const allAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+        const patientAppointments = allAppointments.filter((apt: any) => apt.patient_id === user.id);
+        
+        setAppointments(patientAppointments);
 
-        // 2. Get Appointments & Records
-        const [appointmentsRes, recordsRes] = await Promise.all([
-          fetch(`/api/patients/${patient.id}/appointments`),
-          fetch(`/api/patients/${patient.id}/records`)
-        ]);
+        // Find next upcoming appointment
+        const now = new Date();
+        const upcoming = patientAppointments.find((a: any) => {
+          const aptDate = new Date(`${a.date}T${a.time}`);
+          // Check if appointment is in the future or within the last hour (ongoing)
+          return aptDate >= new Date(now.getTime() - 60 * 60 * 1000) && a.status === 'scheduled';
+        });
+        
+        setNextAppointment(upcoming || null);
 
-        if (appointmentsRes.ok) {
-          const apts = await appointmentsRes.json();
-          setAppointments(apts);
-          // Find next upcoming appointment
-          const now = new Date();
-          const upcoming = apts.find((a: any) => {
-            const aptDate = new Date(`${a.date}T${a.time}`);
-            // Check if appointment is in the future or within the last hour (ongoing)
-            return aptDate >= new Date(now.getTime() - 60 * 60 * 1000);
-          });
-          setNextAppointment(upcoming || null);
-        }
-
-        if (recordsRes.ok) {
-          setRecords(await recordsRes.json());
-        }
+        // 2. Get Records from localStorage
+        const allRecords = JSON.parse(localStorage.getItem('telemed_records') || '[]');
+        const patientRecords = allRecords.filter((rec: any) => rec.patient_id === user.id);
+        setRecords(patientRecords);
 
       } catch (error) {
         console.error('Error fetching patient dashboard data:', error);
@@ -75,7 +68,7 @@ export default function PatientDashboard() {
     };
 
     fetchData();
-  }, [user.email]);
+  }, [user.id]);
 
   // Check if can enter room (5 minutes before)
   useEffect(() => {
@@ -135,7 +128,7 @@ export default function PatientDashboard() {
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Sua Próxima Consulta</h2>
             {nextAppointment ? (
               <>
-                <p className="text-slate-600 mb-6">{nextAppointment.doctor_name || 'Médico'} - Cardiologista</p>
+                <p className="text-slate-600 mb-6">{nextAppointment.doctor_name || 'Médico'}</p>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                   {canEnterRoom ? (
@@ -169,7 +162,7 @@ export default function PatientDashboard() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-indigo-600/70 font-medium">Data</span>
-                  <span className="text-indigo-900 font-bold">{new Date(nextAppointment.date).toLocaleDateString()}</span>
+                  <span className="text-indigo-900 font-bold">{new Date(nextAppointment.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-indigo-600/70 font-medium">Horário</span>
@@ -204,7 +197,7 @@ export default function PatientDashboard() {
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 uppercase tracking-wider">
                       {record.type}
                     </span>
-                    <span className="text-sm font-medium text-slate-500">{new Date(record.date).toLocaleDateString()}</span>
+                    <span className="text-sm font-medium text-slate-500">{new Date(record.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-1">{record.doctor_name || 'Médico'}</h3>
                   <p className="text-sm text-slate-600 mb-6 flex items-center gap-1.5">
