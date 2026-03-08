@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, User, HeartPulse } from 'lucide-react';
+import { supabase } from '../../supabase';
 
 export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
@@ -14,29 +15,39 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      const data = await response.json();
+      if (authError) {
+        setError(authError.message || 'Login failed');
+        return;
+      }
 
-      if (response.ok) {
-        // Store user info in localStorage (or context)
-        localStorage.setItem('user', JSON.stringify(data));
-        
-        // Redirect based on role
-        if (data.role === 'doctor') {
-          navigate('/doctor');
-        } else {
-          navigate('/patient');
-        }
+      // Fetch user profile from Supabase to get role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        setError('Error fetching user profile');
+        return;
+      }
+
+      // Store user info in localStorage
+      localStorage.setItem('user', JSON.stringify({ ...data.user, role: profile.role }));
+      
+      // Redirect based on role
+      if (profile.role === 'doctor') {
+        navigate('/doctor');
       } else {
-        setError(data.error || 'Login failed');
+        navigate('/patient');
       }
     } catch (err) {
-      setError('Network error');
+      setError('An unexpected error occurred');
     }
   };
 

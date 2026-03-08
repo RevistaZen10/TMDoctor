@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Stethoscope, UserRound, ArrowLeft } from 'lucide-react';
+import { supabase } from '../../supabase';
 
 export default function Register() {
   const [profile, setProfile] = useState<'doctor' | 'patient' | null>(null);
@@ -27,21 +28,42 @@ export default function Register() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, role: profile }),
+      // 1. Create Auth User
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        navigate('/login'); // Or directly to 2FA setup
-      } else {
-        setError(data.error || 'Registration failed');
+      if (authError) {
+        setError(authError.message || 'Registration failed');
+        return;
       }
+
+      // 2. Insert Profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            id: authData.user?.id,
+            name: formData.name,
+            role: profile,
+            cpf: formData.cpf,
+            phone: formData.phone,
+            dob: formData.dob,
+            specialty: formData.specialty,
+            price: formData.price,
+            pix: formData.pix
+          }
+        ]);
+
+      if (profileError) {
+        setError('Error creating profile: ' + profileError.message);
+        return;
+      }
+
+      navigate('/login');
     } catch (err) {
-      setError('Network error');
+      setError('An unexpected error occurred');
     }
   };
 
