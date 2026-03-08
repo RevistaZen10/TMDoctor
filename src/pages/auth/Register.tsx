@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Stethoscope, UserRound, ArrowLeft } from 'lucide-react';
-import { supabase } from '../../supabase';
 
 export default function Register() {
   const [profile, setProfile] = useState<'doctor' | 'patient' | null>(null);
@@ -28,21 +27,22 @@ export default function Register() {
     setError('');
 
     try {
-      // 1. Create Auth User
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (authError) {
-        setError(authError.message || 'Registration failed');
+      // 1. Get existing users from localStorage
+      const existingUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+      
+      // 2. Check if email already exists
+      const userExists = existingUsers.find((u: any) => u.email === formData.email);
+      if (userExists) {
+        setError('Este e-mail já está cadastrado.');
         return;
       }
 
-      // 2. Insert Profile
-      const profileData: any = {
-        id: authData.user?.id,
+      // 3. Create new user object
+      const newUser: any = {
+        id: Date.now().toString(), // Generate a simple unique ID
         name: formData.name,
+        email: formData.email,
+        password: formData.password, // Storing password in plain text ONLY for testing
         role: profile,
         cpf: formData.cpf,
         phone: formData.phone,
@@ -50,23 +50,19 @@ export default function Register() {
       };
 
       if (profile === 'doctor') {
-        profileData.specialty = formData.specialty;
-        profileData.price = formData.price ? parseFloat(formData.price) : null;
-        profileData.pix = formData.pix;
+        newUser.specialty = formData.specialty;
+        newUser.price = formData.price ? parseFloat(formData.price) : null;
+        newUser.pix = formData.pix;
       }
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([profileData]);
+      // 4. Save to localStorage
+      existingUsers.push(newUser);
+      localStorage.setItem('telemed_users', JSON.stringify(existingUsers));
 
-      if (profileError) {
-        setError('Error creating profile: ' + profileError.message);
-        return;
-      }
-
+      // 5. Redirect to login
       navigate('/login');
     } catch (err) {
-      setError('An unexpected error occurred');
+      setError('Ocorreu um erro inesperado ao salvar os dados.');
     }
   };
 

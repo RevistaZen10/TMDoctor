@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, User, HeartPulse } from 'lucide-react';
-import { supabase } from '../../supabase';
 
 export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
@@ -15,39 +14,28 @@ export default function Login() {
     setError('');
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (authError) {
-        setError(authError.message || 'Login failed');
-        return;
-      }
-
-      // Fetch user profile from Supabase to get role
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError) {
-        setError('Error fetching user profile');
-        return;
-      }
-
-      // Store user info in localStorage
-      localStorage.setItem('user', JSON.stringify({ ...data.user, role: profile.role }));
+      // 1. Get users from localStorage
+      const existingUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
       
-      // Redirect based on role
-      if (profile.role === 'doctor') {
+      // 2. Find matching user
+      const user = existingUsers.find((u: any) => u.email === email && u.password === password);
+
+      if (!user) {
+        setError('E-mail ou senha inválidos.');
+        return;
+      }
+
+      // 3. Store active user info in localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // 4. Redirect based on role
+      if (user.role === 'doctor') {
         navigate('/doctor');
       } else {
         navigate('/patient');
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      setError('Ocorreu um erro inesperado.');
     }
   };
 
