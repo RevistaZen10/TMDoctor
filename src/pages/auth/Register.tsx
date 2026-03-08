@@ -40,21 +40,24 @@ export default function Register() {
       }
 
       // 2. Insert Profile
+      const profileData: any = {
+        id: authData.user?.id,
+        name: formData.name,
+        role: profile,
+        cpf: formData.cpf,
+        phone: formData.phone,
+        dob: formData.dob || null,
+      };
+
+      if (profile === 'doctor') {
+        profileData.specialty = formData.specialty;
+        profileData.price = formData.price ? parseFloat(formData.price) : null;
+        profileData.pix = formData.pix;
+      }
+
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert([
-          {
-            id: authData.user?.id,
-            name: formData.name,
-            role: profile,
-            cpf: formData.cpf,
-            phone: formData.phone,
-            dob: formData.dob,
-            specialty: formData.specialty,
-            price: formData.price,
-            pix: formData.pix
-          }
-        ]);
+        .insert([profileData]);
 
       if (profileError) {
         setError('Error creating profile: ' + profileError.message);
