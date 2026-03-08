@@ -1,0 +1,8 @@
+{
+  "name": "TeleMed Pro",
+  "description": "Plataforma de telemedicina para médicos e pacientes com prontuário eletrônico e videochamadas.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
