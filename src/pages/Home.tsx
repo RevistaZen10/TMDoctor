@@ -17,6 +17,7 @@ export default function Home() {
               <a href="#sobre" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Sobre</a>
               <a href="#recursos" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Recursos</a>
               <a href="#comunidade" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Comunidade</a>
+              <a href="#autores" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Autores</a>
             </div>
             <div>
               <Link to="/login" className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-cyan-500 hover:bg-cyan-600 transition-colors">
@@ -154,6 +155,35 @@ export default function Home() {
                     <p className="text-cyan-50 text-sm">Conectando famílias a especialistas com amor e praticidade.</p>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Autores Section */}
+      <section id="autores" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-orange-50 rounded-3xl p-8 md:p-12 border border-orange-100 shadow-sm text-center max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-slate-900 mb-8">Autores do Projeto</h2>
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="text-left space-y-4">
+                <div className="inline-block px-4 py-2 bg-cyan-100 text-cyan-800 rounded-full font-semibold text-sm mb-2">
+                  Projeto Inovador
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800">Administração</h3>
+                <p className="text-xl text-slate-600 font-medium">2º Módulo</p>
+                <p className="text-lg text-slate-500 font-bold">ETEC</p>
+              </div>
+              <div className="text-left bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <Users className="w-6 h-6 text-amber-500" />
+                  <h4 className="text-lg font-bold text-slate-800">Integrantes</h4>
+                </div>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  Marisa, Geovane, Rebeca,<br />
+                  Gabrieli, Ieda e Enzo
+                </p>
               </div>
             </div>
           </div>
