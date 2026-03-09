@@ -186,6 +186,21 @@ export default function Home() {
                 </p>
               </div>
             </div>
+
+            <div className="mt-8 pt-8 border-t border-orange-200 text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center shrink-0">
+                  <Sparkles className="w-6 h-6 text-cyan-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Contribuição</h4>
+                  <p className="text-lg font-bold text-slate-800">Paulo Sérgio de Andrade</p>
+                </div>
+              </div>
+              <a href="https://www.matematico10.com.br/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-cyan-500 hover:bg-cyan-600 transition-colors">
+                Visitar Site Pessoal
+              </a>
+            </div>
           </div>
         </div>
       </section>
