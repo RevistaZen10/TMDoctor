@@ -182,7 +182,7 @@ export default function Home() {
                 </div>
                 <p className="text-slate-600 leading-relaxed text-lg">
                   Marisa, Geovane, Rebeca,<br />
-                  Gabrieli, Ieda e Enzo
+                  Gabrieli, Ieda e Camila
                 </p>
               </div>
             </div>
