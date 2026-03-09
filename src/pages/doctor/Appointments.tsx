@@ -96,8 +96,8 @@ export default function Appointments() {
       }
     }
 
-    // Open k10.html in same tab to avoid iframe popup blockers
-    window.location.href = '/k10.html';
+    // Open WhatsApp
+    window.open('https://wa.me/5511999999999?text=Olá', '_blank');
   };
 
   return (

@@ -16,7 +16,6 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-6">
               <a href="#sobre" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Sobre</a>
               <a href="#autores" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Autores</a>
-              <a href="/k10.html" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Bate Papo</a>
             </div>
             <div>
               <Link to="/login" className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-cyan-500 hover:bg-cyan-600 transition-colors">
