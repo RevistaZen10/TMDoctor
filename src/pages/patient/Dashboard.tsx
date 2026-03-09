@@ -46,12 +46,7 @@ export default function PatientDashboard() {
         setAppointments(patientAppointments);
 
         // Find next upcoming appointment
-        const now = new Date();
-        const upcoming = patientAppointments.find((a: any) => {
-          const aptDate = new Date(`${a.date}T${a.time}`);
-          // Check if appointment is in the future or within the last hour (ongoing)
-          return aptDate >= new Date(now.getTime() - 60 * 60 * 1000) && a.status === 'scheduled';
-        });
+        const upcoming = patientAppointments.find((a: any) => a.status === 'scheduled');
         
         setNextAppointment(upcoming || null);
 
@@ -69,33 +64,6 @@ export default function PatientDashboard() {
 
     fetchData();
   }, [user.id]);
-
-  // Check if can enter room (5 minutes before)
-  useEffect(() => {
-    if (!nextAppointment) {
-      setCanEnterRoom(false);
-      return;
-    }
-
-    const checkTime = () => {
-      const now = new Date();
-      const aptDate = new Date(`${nextAppointment.date}T${nextAppointment.time}`);
-      const diffMinutes = (aptDate.getTime() - now.getTime()) / (1000 * 60);
-      
-      // Allow entry if less than 5 minutes before, or if we are past the start time (but not too far, e.g. 1 hour)
-      // diffMinutes < 5 means we are within 5 mins of start or past start
-      // diffMinutes > -60 means we are less than 60 mins late
-      if (diffMinutes <= 5 && diffMinutes > -60) {
-        setCanEnterRoom(true);
-      } else {
-        setCanEnterRoom(false);
-      }
-    };
-
-    checkTime();
-    const interval = setInterval(checkTime, 30000); // Check every 30s
-    return () => clearInterval(interval);
-  }, [nextAppointment]);
 
   const handleEnterRoom = () => {
     if (!nextAppointment || !user.peer_id) return;
@@ -116,8 +84,8 @@ export default function PatientDashboard() {
       }
     }
 
-    // Open k10.html in new tab
-    window.open('/k10.html', '_blank');
+    // Open k10.html in same tab to avoid iframe popup blockers
+    window.location.href = '/k10.html';
   };
 
   return (
@@ -131,19 +99,13 @@ export default function PatientDashboard() {
                 <p className="text-slate-600 mb-6">{nextAppointment.doctor_name || 'Médico'}</p>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                  {canEnterRoom ? (
-                    <button
-                      onClick={handleEnterRoom}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl shadow-lg font-bold text-lg transition-all bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-emerald-200"
-                    >
-                      <Video className="w-6 h-6" />
-                      Entrar na Sala de Espera
-                    </button>
-                  ) : (
-                    <div className="text-sm text-slate-500 bg-slate-100 px-4 py-2 rounded-lg">
-                      A sala de espera será liberada 5 minutos antes da consulta.
-                    </div>
-                  )}
+                  <button
+                    onClick={handleEnterRoom}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl shadow-lg font-bold text-lg transition-all bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-emerald-200"
+                  >
+                    <Video className="w-6 h-6" />
+                    Entrar na Sala de Espera
+                  </button>
                 </div>
               </>
             ) : (

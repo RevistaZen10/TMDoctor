@@ -1,6 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Lock, User, HeartPulse } from 'lucide-react';
+import { Lock, User, HeartPulse, Info } from 'lucide-react';
+
+const MOCK_USERS = [
+  { id: 'd1', name: 'Dra. Ana Silva', email: 'dra.ana@telemed.com', password: '123', role: 'doctor', specialty: 'Psiquiatra', peer_id: 'doc1' },
+  { id: 'd2', name: 'Dr. Carlos Mendes', email: 'dr.carlos@telemed.com', password: '123', role: 'doctor', specialty: 'Psicólogo', peer_id: 'doc2' },
+  { id: 'd3', name: 'Dra. Beatriz Costa', email: 'dra.beatriz@telemed.com', password: '123', role: 'doctor', specialty: 'Neuropediatra', peer_id: 'doc3' },
+  { id: 'p1', name: 'Maria Oliveira', cpf: '111.222.333-44', phone: '(11) 98888-7777', dob: '1985-04-12', email: 'maria@email.com', password: '123', role: 'patient', peer_id: 'pat1' },
+  { id: 'p2', name: 'Joana Santos', cpf: '555.666.777-88', phone: '(11) 99999-0000', dob: '1990-08-25', email: 'joana@email.com', password: '123', role: 'patient', peer_id: 'pat2' }
+];
+
+const MOCK_APPOINTMENTS = [
+  { id: 'a1', doctor_id: 'd1', patient_id: 'p1', date: new Date().toISOString().split('T')[0], time: '14:00', status: 'scheduled' },
+  { id: 'a2', doctor_id: 'd2', patient_id: 'p2', date: new Date().toISOString().split('T')[0], time: '15:30', status: 'scheduled' },
+  { id: 'a3', doctor_id: 'd1', patient_id: 'p2', date: '2026-03-01', time: '10:00', status: 'completed' }
+];
+
+const MOCK_RECORDS = [
+  { id: 1, patient_id: 'p1', doctor_id: 'd1', doctor_name: 'Dra. Ana Silva', date: '2026-02-15T14:30:00.000Z', content: 'Paciente relata melhora no sono da criança após ajuste na rotina. Continuaremos com a mesma abordagem.', type: 'Evolução', attachment: null },
+  { id: 2, patient_id: 'p2', doctor_id: 'd2', doctor_name: 'Dr. Carlos Mendes', date: '2026-02-20T10:00:00.000Z', content: 'Primeira sessão de acolhimento. Mãe apresenta sinais de sobrecarga. Iniciado plano de autocuidado.', type: 'Evolução', attachment: null }
+];
 
 export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
@@ -8,6 +27,38 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Users
+    const existingUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+    if (existingUsers.length === 0) {
+      localStorage.setItem('telemed_users', JSON.stringify(MOCK_USERS));
+    } else {
+      const combinedUsers = [...existingUsers];
+      let updated = false;
+      MOCK_USERS.forEach(mockUser => {
+        if (!combinedUsers.find(u => u.email === mockUser.email)) {
+          combinedUsers.push(mockUser);
+          updated = true;
+        }
+      });
+      if (updated) {
+        localStorage.setItem('telemed_users', JSON.stringify(combinedUsers));
+      }
+    }
+
+    // Appointments
+    const existingAppointments = JSON.parse(localStorage.getItem('telemed_appointments') || '[]');
+    if (existingAppointments.length === 0) {
+      localStorage.setItem('telemed_appointments', JSON.stringify(MOCK_APPOINTMENTS));
+    }
+
+    // Records
+    const existingRecords = JSON.parse(localStorage.getItem('telemed_records') || '[]');
+    if (existingRecords.length === 0) {
+      localStorage.setItem('telemed_records', JSON.stringify(MOCK_RECORDS));
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +90,13 @@ export default function Login() {
     }
   };
 
+  const fillCredentials = (mockEmail: string) => {
+    setEmail(mockEmail);
+    setPassword('123');
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row items-center justify-center p-4 gap-8">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="flex justify-center mb-8">
@@ -132,6 +188,52 @@ export default function Login() {
                 Criar uma conta
               </Link>
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Example Accounts Panel */}
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-indigo-100">
+        <div className="bg-indigo-50 p-4 border-b border-indigo-100 flex items-center gap-2">
+          <Info className="w-5 h-5 text-indigo-600" />
+          <h3 className="font-bold text-indigo-900">Contas de Exemplo (Testes)</h3>
+        </div>
+        <div className="p-6 space-y-6">
+          <div>
+            <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Médicos Especialistas</h4>
+            <div className="space-y-2">
+              {MOCK_USERS.filter(u => u.role === 'doctor').map(doc => (
+                <button 
+                  key={doc.id}
+                  onClick={() => fillCredentials(doc.email)}
+                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors group"
+                >
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-slate-800 group-hover:text-indigo-700">{doc.name}</span>
+                    <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-full">{doc.specialty}</span>
+                  </div>
+                  <div className="text-sm text-slate-500">E-mail: {doc.email}</div>
+                  <div className="text-sm text-slate-500">Senha: {doc.password}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Pacientes (Mães)</h4>
+            <div className="space-y-2">
+              {MOCK_USERS.filter(u => u.role === 'patient').map(patient => (
+                <button 
+                  key={patient.id}
+                  onClick={() => fillCredentials(patient.email)}
+                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors group"
+                >
+                  <div className="font-bold text-slate-800 group-hover:text-indigo-700 mb-1">{patient.name}</div>
+                  <div className="text-sm text-slate-500">E-mail: {patient.email}</div>
+                  <div className="text-sm text-slate-500">Senha: {patient.password}</div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

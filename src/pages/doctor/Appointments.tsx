@@ -96,8 +96,8 @@ export default function Appointments() {
       }
     }
 
-    // Open k10.html in new tab
-    window.open('/k10.html', '_blank');
+    // Open k10.html in same tab to avoid iframe popup blockers
+    window.location.href = '/k10.html';
   };
 
   return (

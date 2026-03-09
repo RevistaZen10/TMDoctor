@@ -37,13 +37,22 @@ export default function PatientProfile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [patientRes, recordsRes] = await Promise.all([
-          fetch(`/api/patients/${id}`),
-          fetch(`/api/patients/${id}/records`)
-        ]);
+        // Fetch patient from localStorage
+        const allUsers = JSON.parse(localStorage.getItem('telemed_users') || '[]');
+        const foundPatient = allUsers.find((u: any) => u.id === id && u.role === 'patient');
+        
+        if (foundPatient) {
+          setPatient(foundPatient);
+        }
 
-        if (patientRes.ok) setPatient(await patientRes.json());
-        if (recordsRes.ok) setRecords(await recordsRes.json());
+        // Fetch records from localStorage
+        const allRecords = JSON.parse(localStorage.getItem('telemed_records') || '[]');
+        const patientRecords = allRecords.filter((r: any) => r.patient_id === id);
+        
+        // Sort by date descending
+        patientRecords.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        
+        setRecords(patientRecords);
       } catch (error) {
         console.error('Error fetching patient data:', error);
       } finally {
@@ -58,29 +67,30 @@ export default function PatientProfile() {
     if (!evolutionText.trim()) return;
 
     try {
-      const response = await fetch('/api/records', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patient_id: id,
-          doctor_id: doctorId,
-          date: new Date().toISOString(),
-          content: evolutionText,
-          type: 'Evolução',
-          attachment: null
-        }),
-      });
+      const newRecord = {
+        id: Date.now(),
+        patient_id: id,
+        doctor_id: doctorId,
+        doctor_name: user.name,
+        date: new Date().toISOString(),
+        content: evolutionText,
+        type: 'Evolução',
+        attachment: null
+      };
 
-      if (response.ok) {
-        setEvolutionText('');
-        // Refresh records
-        const recordsRes = await fetch(`/api/patients/${id}/records`);
-        if (recordsRes.ok) setRecords(await recordsRes.json());
-      } else {
-        alert('Erro ao salvar registro');
-      }
+      const allRecords = JSON.parse(localStorage.getItem('telemed_records') || '[]');
+      allRecords.push(newRecord);
+      localStorage.setItem('telemed_records', JSON.stringify(allRecords));
+
+      setEvolutionText('');
+      
+      // Refresh records
+      const patientRecords = allRecords.filter((r: any) => r.patient_id === id);
+      patientRecords.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setRecords(patientRecords);
     } catch (error) {
       console.error('Error creating record:', error);
+      alert('Erro ao salvar registro');
     }
   };
 
@@ -103,8 +113,8 @@ export default function PatientProfile() {
       }
     }
 
-    // Open k10.html in new tab
-    window.open('/k10.html', '_blank');
+    // Open k10.html in same tab to avoid iframe popup blockers
+    window.location.href = '/k10.html';
   };
 
   if (loading) return <div className="p-8 text-center">Carregando...</div>;
