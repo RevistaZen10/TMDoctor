@@ -201,6 +201,26 @@ export default function Home() {
                 Visitar Site Pessoal
               </a>
             </div>
+
+            <div className="mt-6 pt-6 border-t border-orange-200 text-left">
+              <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Detalhes da Publicação</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <p className="text-xs text-slate-500 font-semibold uppercase mb-1">DOI</p>
+                  <a href="https://doi.org/10.5281/zenodo.18916862" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 font-medium break-all">
+                    10.5281/zenodo.18916862
+                  </a>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <p className="text-xs text-slate-500 font-semibold uppercase mb-1">Resource Type</p>
+                  <p className="text-slate-800 font-medium">Publication</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <p className="text-xs text-slate-500 font-semibold uppercase mb-1">Publisher</p>
+                  <p className="text-slate-800 font-medium">Zenodo</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
