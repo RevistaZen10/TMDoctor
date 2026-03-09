@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Download, Clock, CheckCircle2, Video } from 'lucide-react';
+import { FileText, Download, Clock, CheckCircle2, Video, XCircle } from 'lucide-react';
 import { cn } from '../../utils';
 
 interface Appointment {
@@ -30,6 +30,8 @@ export default function PatientDashboard() {
   const [loading, setLoading] = useState(true);
   const [nextAppointment, setNextAppointment] = useState<Appointment | null>(null);
   const [canEnterRoom, setCanEnterRoom] = useState(false);
+
+  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
 
   // Get user info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -153,7 +155,11 @@ export default function PatientDashboard() {
             <p className="text-slate-500 col-span-2 text-center py-8 bg-white rounded-xl border border-slate-200">Nenhum documento encontrado.</p>
           ) : (
             records.map((record) => (
-              <div key={record.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:border-indigo-300 transition-colors group">
+              <div 
+                key={record.id} 
+                className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:border-indigo-300 transition-colors group cursor-pointer"
+                onClick={() => setSelectedRecord(record)}
+              >
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 uppercase tracking-wider">
@@ -164,12 +170,15 @@ export default function PatientDashboard() {
                   <h3 className="text-lg font-bold text-slate-900 mb-1">{record.doctor_name || 'Médico'}</h3>
                   <p className="text-sm text-slate-600 mb-6 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    Documento liberado para visualização
+                    Clique para visualizar o prontuário
                   </p>
                 </div>
                 
                 {record.attachment && (
-                  <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-50 text-indigo-600 border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 transition-colors font-medium text-sm group-hover:bg-indigo-600 group-hover:text-white">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); /* download logic */ }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-50 text-indigo-600 border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-200 transition-colors font-medium text-sm group-hover:bg-indigo-600 group-hover:text-white"
+                  >
                     <Download className="w-4 h-4" />
                     Baixar {record.attachment}
                   </button>
@@ -179,6 +188,40 @@ export default function PatientDashboard() {
           )}
         </div>
       </div>
+
+      {selectedRecord && (
+        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">{selectedRecord.type}</h3>
+                <p className="text-sm text-slate-500">
+                  {new Date(selectedRecord.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} com {selectedRecord.doctor_name}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedRecord(null)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="prose prose-slate max-w-none">
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 whitespace-pre-wrap text-slate-700">
+                {selectedRecord.content}
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setSelectedRecord(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

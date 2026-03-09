@@ -10,16 +10,60 @@ const MOCK_USERS = [
   { id: 'p2', name: 'Joana Santos', cpf: '555.666.777-88', phone: '(11) 99999-0000', dob: '1990-08-25', email: 'joana@email.com', password: '123', role: 'patient', peer_id: 'pat2' }
 ];
 
-const MOCK_APPOINTMENTS = [
-  { id: 'a1', doctor_id: 'd1', patient_id: 'p1', date: new Date().toISOString().split('T')[0], time: '14:00', status: 'scheduled' },
-  { id: 'a2', doctor_id: 'd2', patient_id: 'p2', date: new Date().toISOString().split('T')[0], time: '15:30', status: 'scheduled' },
-  { id: 'a3', doctor_id: 'd1', patient_id: 'p2', date: '2026-03-01', time: '10:00', status: 'completed' }
-];
+const MOCK_APPOINTMENTS: any[] = [];
+const MOCK_RECORDS: any[] = [];
 
-const MOCK_RECORDS = [
-  { id: 1, patient_id: 'p1', doctor_id: 'd1', doctor_name: 'Dra. Ana Silva', date: '2026-02-15T14:30:00.000Z', content: 'Paciente relata melhora no sono da criança após ajuste na rotina. Continuaremos com a mesma abordagem.', type: 'Evolução', attachment: null },
-  { id: 2, patient_id: 'p2', doctor_id: 'd2', doctor_name: 'Dr. Carlos Mendes', date: '2026-02-20T10:00:00.000Z', content: 'Primeira sessão de acolhimento. Mãe apresenta sinais de sobrecarga. Iniciado plano de autocuidado.', type: 'Evolução', attachment: null }
+const pastDates = ['2026-01-10', '2026-02-05', '2026-03-01'];
+const futureDates = ['2026-03-15', '2026-04-10', '2026-05-05'];
+const times = ['09:00', '10:30', '14:00'];
+
+let aptId = 1;
+let recId = 1;
+
+const doctors = [
+  { id: 'd1', name: 'Dra. Ana Silva' },
+  { id: 'd2', name: 'Dr. Carlos Mendes' },
+  { id: 'd3', name: 'Dra. Beatriz Costa' }
 ];
+const patients = ['p1', 'p2'];
+
+patients.forEach(pId => {
+  doctors.forEach(doc => {
+    // Past appointments
+    pastDates.forEach((date, i) => {
+      MOCK_APPOINTMENTS.push({
+        id: `a${aptId++}`,
+        doctor_id: doc.id,
+        patient_id: pId,
+        date: date,
+        time: times[i],
+        status: 'completed'
+      });
+      MOCK_RECORDS.push({
+        id: recId++,
+        patient_id: pId,
+        doctor_id: doc.id,
+        doctor_name: doc.name,
+        date: `${date}T${times[i]}:00.000Z`,
+        content: `Atendimento realizado em ${date}. Paciente apresentou boa evolução. Orientações mantidas.`,
+        type: 'Evolução',
+        attachment: null
+      });
+    });
+
+    // Future appointments
+    futureDates.forEach((date, i) => {
+      MOCK_APPOINTMENTS.push({
+        id: `a${aptId++}`,
+        doctor_id: doc.id,
+        patient_id: pId,
+        date: date,
+        time: times[i],
+        status: 'scheduled'
+      });
+    });
+  });
+});
 
 export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
