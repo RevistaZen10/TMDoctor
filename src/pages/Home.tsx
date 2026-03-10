@@ -205,8 +205,8 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                   <p className="text-xs text-slate-500 font-semibold uppercase mb-1">DOI</p>
-                  <a href="https://doi.org/10.5281/zenodo.18945442" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 font-medium break-all">
-                    10.5281/zenodo.18945442
+                  <a href="https://doi.org/10.5281/zenodo.18945604" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 font-medium break-all">
+                    10.5281/zenodo.18945604
                   </a>
                 </div>
               </div>
