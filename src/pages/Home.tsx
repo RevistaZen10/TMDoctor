@@ -184,6 +184,33 @@ export default function Home() {
                 </p>
               </div>
             </div>
+
+            <div className="mt-8 pt-8 border-t border-orange-200 text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center shrink-0">
+                  <Sparkles className="w-6 h-6 text-cyan-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Contribuição</h4>
+                  <p className="text-lg font-bold text-slate-800">Paulo Sérgio de Andrade</p>
+                </div>
+              </div>
+              <a href="https://www.matematico10.com.br/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-cyan-500 hover:bg-cyan-600 transition-colors">
+                Visitar Site Pessoal
+              </a>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-orange-200 text-left">
+              <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Projeto Inovador</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <p className="text-xs text-slate-500 font-semibold uppercase mb-1">DOI</p>
+                  <a href="https://doi.org/10.5281/zenodo.18945442" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 font-medium break-all">
+                    10.5281/zenodo.18945442
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
