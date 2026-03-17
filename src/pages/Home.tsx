@@ -200,6 +200,21 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            <div className="mt-6 pt-6 border-t border-orange-200 text-left">
+              <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Projeto Cuidar Mais</h4>
+              <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                Plano de Negócio apresentado como requisito parcial para a conclusão do Curso Técnico em Administração do Centro Estadual de Educação Tecnológica Paula Souza – ETEC de Itaquera, extensão CEU Parque Veredas.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <p className="text-xs text-slate-500 font-semibold uppercase mb-1">DOI</p>
+                  <a href="https://doi.org/10.5281/zenodo.19078208" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 font-medium break-all">
+                    10.5281/zenodo.19078208
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
