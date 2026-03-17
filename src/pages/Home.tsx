@@ -164,8 +164,12 @@ export default function Home() {
                   <h4 className="text-lg font-bold text-slate-800">Integrantes</h4>
                 </div>
                 <p className="text-slate-600 leading-relaxed text-lg">
-                  Marisa, Geovane, Rebeca,<br />
-                  Gabrieli, Ieda e Camila
+                  Camila Nunes de Andrade<br />
+                  Dyane Rebeca Fiuza dos Santos<br />
+                  Gabrieli Nascimento de Barros<br />
+                  Geovane Santos Paiva<br />
+                  Leda Moreira de Araujo Silva<br />
+                  Marisa Ferreira Lima
                 </p>
               </div>
             </div>
