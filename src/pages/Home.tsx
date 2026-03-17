@@ -133,7 +133,7 @@ export default function Home() {
             <div className="lg:w-1/2 relative">
               <div className="aspect-square rounded-3xl overflow-hidden bg-cyan-600 relative shadow-2xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                  src="https://i.ibb.co/BKK6YNKv/asssssssssssssssssss.jpg" 
                   alt="Mãe e filho sorrindo em consulta online" 
                   className="object-cover w-full h-full opacity-90"
                   referrerPolicy="no-referrer"
