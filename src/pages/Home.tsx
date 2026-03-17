@@ -133,8 +133,8 @@ export default function Home() {
             <div className="lg:w-1/2 relative">
               <div className="rounded-3xl overflow-hidden bg-cyan-600 relative shadow-2xl">
                 <img 
-                  src="https://i.ibb.co/BKK6YNKv/asssssssssssssssssss.jpg" 
-                  alt="Mãe e filho sorrindo em consulta online" 
+                  src="https://i.ibb.co/9kdQb44P/Gemini-Generated-Image-jvjv8ujvjv8ujvjv.png" 
+                  alt="Gemini-Generated-Image-jvjv8ujvjv8ujvjv" 
                   className="w-full h-auto opacity-90"
                   referrerPolicy="no-referrer"
                 />
