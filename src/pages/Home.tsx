@@ -131,28 +131,13 @@ export default function Home() {
               </Link>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="aspect-square rounded-3xl overflow-hidden bg-cyan-600 relative shadow-2xl">
+              <div className="rounded-3xl overflow-hidden bg-cyan-600 relative shadow-2xl">
                 <img 
                   src="https://i.ibb.co/BKK6YNKv/asssssssssssssssssss.jpg" 
                   alt="Mãe e filho sorrindo em consulta online" 
-                  className="object-cover w-full h-full opacity-90"
+                  className="w-full h-auto opacity-90"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/80 to-transparent"></div>
-                <div className="absolute bottom-8 left-8 right-8">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center">
-                        <Video className="w-6 h-6 text-slate-900" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-white">TeleMed Pro</h4>
-                        <p className="text-cyan-100 text-sm">Plataforma Integrada</p>
-                      </div>
-                    </div>
-                    <p className="text-cyan-50 text-sm">Conectando famílias a especialistas com amor e praticidade.</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
