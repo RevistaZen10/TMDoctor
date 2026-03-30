@@ -11,7 +11,7 @@ export default function Home() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <Brain className="w-8 h-8 text-cyan-500" />
-              <span className="text-xl font-bold text-slate-900">NeuroMães</span>
+              <span className="text-xl font-bold text-slate-900">Cuidar +</span>
             </div>
             <div className="hidden md:flex items-center gap-6">
               <a href="#sobre" className="text-slate-600 hover:text-cyan-500 font-medium transition-colors">Sobre</a>
@@ -133,8 +133,8 @@ export default function Home() {
             <div className="lg:w-1/2 relative">
               <div className="rounded-3xl overflow-hidden bg-cyan-600 relative shadow-2xl">
                 <img 
-                  src="https://i.ibb.co/9kdQb44P/Gemini-Generated-Image-jvjv8ujvjv8ujvjv.png" 
-                  alt="Gemini-Generated-Image-jvjv8ujvjv8ujvjv" 
+                  src="https://i.ibb.co/hR2LBzbv/Whats-App-Image-2026-03-30-at-14-53-56.jpg" 
+                  alt="Cuidar +" 
                   className="w-full h-auto opacity-90"
                   referrerPolicy="no-referrer"
                 />
@@ -224,10 +224,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <Brain className="w-6 h-6 text-cyan-500" />
-            <span className="text-lg font-bold text-slate-900">NeuroMães</span>
+            <span className="text-lg font-bold text-slate-900">Cuidar +</span>
           </div>
           <p className="text-slate-500 text-sm text-center md:text-left">
-            © {new Date().getFullYear()} NeuroMães. Todos os direitos reservados. Feito com amor para mães atípicas.
+            © {new Date().getFullYear()} Cuidar +. Todos os direitos reservados. Feito com amor para mães atípicas.
           </p>
           <div className="flex gap-4">
             <Link to="/login" className="text-cyan-600 hover:text-cyan-700 font-medium text-sm">
