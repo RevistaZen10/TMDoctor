@@ -11,6 +11,7 @@ import Appointments from './pages/doctor/Appointments';
 import PatientLayout from './layouts/PatientLayout';
 import PatientDashboard from './pages/patient/Dashboard';
 import PatientAppointments from './pages/patient/Appointments';
+import AccessibilityMenu from './components/AccessibilityMenu';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="appointments" element={<PatientAppointments />} />
         </Route>
       </Routes>
+      <AccessibilityMenu />
     </BrowserRouter>
   );
 }
